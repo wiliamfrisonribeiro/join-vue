@@ -46,6 +46,14 @@
           no-data-text="Sem dados"
         ></v-autocomplete>
       </v-card-text>
+      <v-row>
+        <v-col cols="12">
+          <v-btn color="secondary" block>
+            <v-icon left dark color="terciary"> mdi-magnify</v-icon
+            >Consultar</v-btn
+          >
+        </v-col>
+      </v-row>
     </v-card>
   </v-menu>
 </template>
@@ -59,9 +67,7 @@ export default {
   }),
 
   created() {
-    this.controller.fetchStation()
-    this.controller.fetchStationType()
-    this.controller.fetchFeatures()
+    this.controller.created()
   },
 
   watch: {

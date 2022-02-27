@@ -1,6 +1,15 @@
+/* eslint-disable */
 import Dados from "../data/repository/dados"
-
-
+import Map from 'ol/Map'
+import 'ol/ol.css'
+// This is library of openlayer for handle map
+import GeoJSON from 'ol/format/GeoJSON'
+import View from 'ol/View'
+import { defaults as defaultControls, ScaleLine } from "ol/control";
+import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
+import { OSM, Vector as VectorSource } from 'ol/source'
+import { Fill, Stroke, Style, Icon, Circle } from 'ol/style'
+import Overlay from 'ol/Overlay'
 class Controller {
     station_list = []
     station_type_list = []
@@ -11,143 +20,194 @@ class Controller {
     geojson = undefined
     context = null
     menuFiltro = false
+    vectorGeoJSON = null
+    source = new VectorSource({
+    })
+
+
     constructor(context) {
         this.context = context
     }
     async created() {
-        await this.fetchFeatures()
-        await this.fetchStation()
-        await this.fetchStationType()
-
+        Promise.all([
+            this.buscaFeatures(),
+            this.buscaStation(),
+            this.buscaStationType(),
+        ])
     }
 
-    /*  change() {
-         this.context.$nextTick(() => {
-             if (this.allTypes) {
-                 this.stations_types_selected = []
-             } else if (this.someTypes) {
-                 this.stations_types_selected = []
-             } else if (this.emptyTypes) {
-                 this.stations_types_selected = this.station_type_list.slice()
-             }
-         })
-     }
- 
-     toggle() {
-         this.context.$nextTick(() => {
-             if (this.allStations) {
-                 this.stations_selected = []
-             } else if (this.someStations) {
-                 this.stations_selected = []
-             } else if (this.emptyStations) {
-                 this.stations_selected = this.stations.slice()
-             }
-         })
-     } */
-
-    async fetchFeatures() {
-
+    async buscaFeatures() {
         const dados = new Dados()
-
         this.geojson = await dados.fetchFeatures()
-
-
-        console.log(this.geojson)
-
-
     }
-    async fetchStation() {
+    async buscaStation() {
         const dados = new Dados()
         this.station_list = await dados.fetchStation()
-        console.log(this.station_list)
     }
 
-    async fetchStationType() {
+    async buscaStationType() {
         const dados = new Dados()
         this.station_type_list = await dados.fetchStationType()
-        console.log(this.station_type_list)
 
     }
-
 
     change() {
         /* eslint-disable */
-        console.log(this.stations_types_selected)
         this.stations = []
-        console.log("teste")
-
-
-
         this.stations_types_selected.forEach(sation_type => {
             this.station_list.forEach(station => {
                 if (sation_type.id == station.station_type_id) {
                     this.stations.push(station)
                 }
             })
-
         })
         console.log(this.stations)
     }
 
-    /* consulting() {
-        let features = []
-        for (let item in this.geojson.features) {
-            for (let station in this.stations_selected) {
-                if (
-                    this.geojson.features[item].properties.id === this.stations_selected[station].id
-                ) {
 
-                    features.push(this.geojson.features[item])
+    initMap() {
+        // create vector layer
+        var source = new VectorSource();
+        var vector = new VectorLayer({
+            source: source,
+        });
+        // create title layer
+        var raster = new TileLayer({
+            source: new OSM(),
+        });
+        // Vector data source in GeoJSON format
+        this.vectorGeoJSON = new VectorLayer({
+            source: this.source,
+            style: function (feature) {
+                //console.log(feature.getProperties()); // <== all geojson properties
+                return [
+                    new Style({
+                        image: new Icon({
+                            scale: 0.9,
+                            color:
+                                feature.get("station_type_id") == "1"
+                                    ? "#7cb5ec"
+                                    : feature.get("station_type_id") == "2"
+                                        ? "#434348"
+                                        : feature.get("station_type_id") == "3"
+                                            ? "#90ed7d"
+                                            : feature.get("station_type_id") == "4"
+                                                ? "#f7a35c"
+                                                : "#8085e9",
+                            src: require("../../assets/location_on-white-48dp.svg"),
+                        }),
+                    }),
+                ];
+            },
+        });
+        // create map with 2 layer
+        var map = new Map({
+            controls: defaultControls().extend([
+                new ScaleLine({
+                    units: "degrees",
+                }),
+            ]),
+            target: "map",
+            layers: [raster, vector, this.vectorGeoJSON],
+            view: new View({
+                projection: "EPSG:4326",
+                center: [-48.815011395380765, -24.650150016322684],
+                zoom: 5,
+            }),
+        });
+        var popup = document.querySelector(".popup-container");
+        var overlayLayer = new Overlay({ element: popup });
+        map.addOverlay(overlayLayer);
+        let station_type = [
+            {
+                id: "1",
+                created_at: "2020-11-30 10:43:46.687141-03",
+                update_at: "2020-11-30 10:43:46.687162-03",
+                name: "AGROMETEOROLOGICAL",
+                color: "#7cb5ec",
+            },
+            {
+                id: "2",
+                created_at: "2020-11-30 10:43:46.688442-03",
+                update_at: "2020-11-30 10:43:46.688459-03",
+                name: "CLIMATOLÓGICO",
+                color: "#434348",
+            },
+            {
+                id: "3",
+                created_at: "2020-11-30 10:43:46.68895-03",
+                update_at: "2020-11-30 10:43:46.688964-03",
+                name: "HIDROCLIMATOLÓGICO",
+                color: "#90ed7d",
+            },
+            {
+                id: "4",
+                created_at: "2020-11-30 10:43:46.689495-03",
+                update_at: "2020-11-30 10:43:46.689513-03",
+                name: "HIDROMÉTRICO",
+                color: "#f7a35c",
+            },
+            {
+                id: "5",
+                created_at: "2020-11-30 10:43:46.690113-03",
+                update_at: "2020-11-30 10:43:46.690134-03",
+                name: "PLUVIOMETRIC",
+                color: "#8085e9",
+            },
+        ];
+        var overlayFeatureId = document.getElementById("feature-id");
+        var overlayFeatureName = document.getElementById("feature-name");
+        var overlayFeatureLatitude = document.getElementById("feature-latitude");
+        var overlayFeatureLongitude =
+            document.getElementById("feature-longitude");
+        var overlayFeatureElevation =
+            document.getElementById("feature-elevation");
+        var overlayFeatureType = document.getElementById("feature-type");
+        var overlayFeatureStart = document.getElementById("feature-start");
+        var overlayFeatureEnd = document.getElementById("feature-end");
+
+        map.on("click", function (e) {
+            overlayLayer.setPosition(undefined);
+            map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
+                overlayLayer.setPosition(e.coordinate);
+                overlayFeatureId.innerHTML = feature.get("id");
+                overlayFeatureName.innerHTML = feature.get("name");
+                overlayFeatureLatitude.innerHTML = feature.get("latitude");
+                overlayFeatureLongitude.innerHTML = feature.get("longitude");
+                overlayFeatureElevation.innerHTML = feature.get("elevation_meters");
+                overlayFeatureStart.innerHTML = dayjs(
+                    feature.get("operation_start_date")
+                ).format("DD/MM/YYYY");
+                //overlayFeatureStart.innerHTML = feature.get("operation_start_date");
+                overlayFeatureEnd.innerHTML = dayjs(
+                    feature.get("operation_end_date")
+                ).format("DD/MM/YYYY");
+                //overlayFeatureEnd.innerHTML = feature.get("operation_end_date");
+                for (let item in station_type) {
+                    if (feature.get("station_type_id") == station_type[item].id) {
+                        overlayFeatureType.innerHTML = station_type[item].name;
+                    }
                 }
-            }
-        }
-        this.geojson.features = features
-        this.context.$emit('stations', this.geojson)
-        this.context.$emit('types', this.stations_types_selected)
+            });
+        });
     }
 
-    allTypes() {
-        return (
-            this.stations_types_selected.length === this.station_type_list.length
-        )
+
+    async getTypes(types) {
+        this.types = types;
     }
-    someTypes() {
-        return (
-            this.stations_types_selected.length > 0 &&
-            this.stations_types_selected.length < this.station_type_list.length
-        )
-    }
-    emptyTypes() {
-        return this.stations_types_selected.length === 0
-    }
-    allStations() {
-        return this.stations_selected.length === this.stations.length
-    }
-    someStations() {
-        return (
-            this.stations_selected.length > 0 &&
-            this.stations_selected.length < this.stations.length
-        )
-    }
-    emptyStations() {
-        return this.stations_selected.length === 0
-    }
-    iconStations() {
-        if (this.allStations) return 'disabled_by_default'
-        if (this.someStations) return 'indeterminate_check_box'
-        if (this.emptyStations) return 'check_box_outline_blank'
-    }
-    iconTypes() {
-        if (this.allTypes) {
-            return 'disabled_by_default'
+    async getStations(stations) {
+        this.stations = stations;
+        if (stations.features.length > 0) {
+            this.source.clear();
+            this.source.addFeatures(new GeoJSON().readFeatures(stations));
+        } else {
+            this.source.clear();
+            this.snackbar = true;
+            this.text = "Nenhuma estação encontrada.";
         }
-        if (this.someTypes) {
-            return 'indeterminate_check_box'
-        }
-        if (this.emptyTypes) {
-            return 'check_box_outline_blank'
-        }
-    } */
+    }
+
 }
 
 
