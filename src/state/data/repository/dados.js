@@ -1,7 +1,8 @@
 class Station {
 
     fetchFeatures() {
-        fetch(
+
+        const response = fetch(
             'https://raw.githubusercontent.com/jacksonks/geojson/master/station_list.geojson'
         )
             .then((response) => response.json())
@@ -11,10 +12,13 @@ class Station {
             .catch((error) => {
                 throw 'Looks like there was a problem: \n', error
             })
+
+
+        return response
     }
 
     fetchStation() {
-        fetch(
+        const response = fetch(
             'https://raw.githubusercontent.com/jacksonks/geojson/master/station.json'
         )
             .then((response) => response.json())
@@ -24,10 +28,13 @@ class Station {
             .catch((error) => {
                 throw 'Looks like there was a problem: \n', error
             })
+
+
+        return response
     }
 
     fetchStationType() {
-        fetch(
+        const response = fetch(
             'https://raw.githubusercontent.com/jacksonks/geojson/master/station_type.json'
         )
             .then((response) => response.json())
@@ -37,6 +44,8 @@ class Station {
             .catch((error) => {
                 throw 'Looks like there was a problem: \n', error
             })
+
+        return response
     }
 
 

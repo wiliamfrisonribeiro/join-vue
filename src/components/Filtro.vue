@@ -15,12 +15,35 @@
           :items="controller.station_type_list"
           label="Tipos de Estações"
           clearable
+          item-text="name"
+          item-value="name"
           multiple
           small-chips
+          outlined
           return-object
           no-data-text="Sem dados"
           persistent-hint
           :hint="`${controller.stations_types_selected.length} Opções Selecionadas`"
+        >
+        </v-autocomplete>
+
+        <v-autocomplete
+          dense
+          :items="controller.stations"
+          v-model="controller.stations_selected"
+          item-text="name"
+          item-value="name"
+          label="Estações"
+          multiple
+          small-chips
+          outlined
+          clearable
+          :disabled="!controller.stations_types_selected.length > 0"
+          :hide-details="!controller.stations_types_selected.length > 0"
+          :persistent-hint="controller.stations_types_selected.length > 0"
+          :hint="`${controller.stations_selected.length} Opções Selecionadas`"
+          return-object
+          no-data-text="Sem dados"
         ></v-autocomplete>
       </v-card-text>
     </v-card>
@@ -39,6 +62,13 @@ export default {
     this.controller.fetchStation()
     this.controller.fetchStationType()
     this.controller.fetchFeatures()
+  },
+
+  watch: {
+    'controller.stations_types_selected'() {
+      console.log('passou')
+      this.controller.change()
+    },
   },
 }
 </script>

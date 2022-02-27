@@ -6,6 +6,7 @@ class Controller {
     station_type_list = []
     stations_types_selected = []
     stations_selected = []
+    stations = []
     expand = true
     geojson = undefined
     context = null
@@ -20,44 +21,36 @@ class Controller {
 
     }
 
-    change() {
-        this.context.$nextTick(() => {
-            if (this.allTypes) {
-                this.stations_types_selected = []
-            } else if (this.someTypes) {
-                this.stations_types_selected = []
-            } else if (this.emptyTypes) {
-                this.stations_types_selected = this.station_type_list.slice()
-            }
-        })
-    }
-
-    toggle() {
-        this.context.$nextTick(() => {
-            if (this.allStations) {
-                this.stations_selected = []
-            } else if (this.someStations) {
-                this.stations_selected = []
-            } else if (this.emptyStations) {
-                this.stations_selected = this.stations.slice()
-            }
-        })
-    }
+    /*  change() {
+         this.context.$nextTick(() => {
+             if (this.allTypes) {
+                 this.stations_types_selected = []
+             } else if (this.someTypes) {
+                 this.stations_types_selected = []
+             } else if (this.emptyTypes) {
+                 this.stations_types_selected = this.station_type_list.slice()
+             }
+         })
+     }
+ 
+     toggle() {
+         this.context.$nextTick(() => {
+             if (this.allStations) {
+                 this.stations_selected = []
+             } else if (this.someStations) {
+                 this.stations_selected = []
+             } else if (this.emptyStations) {
+                 this.stations_selected = this.stations.slice()
+             }
+         })
+     } */
 
     async fetchFeatures() {
 
-        fetch(
-            'https://raw.githubusercontent.com/jacksonks/geojson/master/station.json'
-        )
-            .then((response) => response.json())
-            .then((response) => {
+        const dados = new Dados()
 
+        this.geojson = await dados.fetchFeatures()
 
-                this.geojson = response.station
-            })
-            .catch((error) => {
-                console.log(error)
-            })
 
         console.log(this.geojson)
 
@@ -71,12 +64,32 @@ class Controller {
 
     async fetchStationType() {
         const dados = new Dados()
-        this.station_type_list = await dados.fetchStationType
+        this.station_type_list = await dados.fetchStationType()
         console.log(this.station_type_list)
 
     }
 
-    consulting() {
+
+    change() {
+        /* eslint-disable */
+        console.log(this.stations_types_selected)
+        this.stations = []
+        console.log("teste")
+
+
+
+        this.stations_types_selected.forEach(sation_type => {
+            this.station_list.forEach(station => {
+                if (sation_type.id == station.station_type_id) {
+                    this.stations.push(station)
+                }
+            })
+
+        })
+        console.log(this.stations)
+    }
+
+    /* consulting() {
         let features = []
         for (let item in this.geojson.features) {
             for (let station in this.stations_selected) {
@@ -134,7 +147,7 @@ class Controller {
         if (this.emptyTypes) {
             return 'check_box_outline_blank'
         }
-    }
+    } */
 }
 
 
