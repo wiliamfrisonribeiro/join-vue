@@ -1,9 +1,9 @@
 /* eslint-disable */
 import Dados from "../data/repository/dados"
-import Map from 'ol/Map'
-import 'ol/ol.css'
+
 // This is library of openlayer for handle map
 import GeoJSON from 'ol/format/GeoJSON'
+import Map from 'ol/Map'
 import View from 'ol/View'
 import { defaults as defaultControls, ScaleLine } from "ol/control";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
@@ -16,13 +16,11 @@ class Controller {
     stations_types_selected = []
     stations_selected = []
     stations = []
-    expand = true
     geojson = undefined
     context = null
-    menuFiltro = false
     vectorGeoJSON = null
-    source = new VectorSource({
-    })
+    drawer = false
+    source = new VectorSource()
 
 
     constructor(context) {
@@ -30,24 +28,26 @@ class Controller {
     }
     async created() {
         Promise.all([
-            this.buscaFeatures(),
-            this.buscaStation(),
-            this.buscaStationType(),
+            this.searchFeatures(),
+            this.searchStation(),
+            this.searchStationType(),
         ])
     }
 
-    async buscaFeatures() {
+    async searchFeatures() {
         const dados = new Dados()
-        this.geojson = await dados.fetchFeatures()
+        this.geojson = await dados.searchFeatures()
     }
-    async buscaStation() {
+    async searchStation() {
         const dados = new Dados()
-        this.station_list = await dados.fetchStation()
+        this.station_list = await dados.serchStation()
     }
 
-    async buscaStationType() {
+    async searchStationType() {
         const dados = new Dados()
-        this.station_type_list = await dados.fetchStationType()
+        this.station_type_list = await dados.searchStationType()
+
+        console.log(this.station_type_list)
 
     }
 
@@ -193,19 +193,41 @@ class Controller {
     }
 
 
-    async getTypes(types) {
-        this.types = types;
-    }
-    async getStations(stations) {
-        this.stations = stations;
-        if (stations.features.length > 0) {
-            this.source.clear();
-            this.source.addFeatures(new GeoJSON().readFeatures(stations));
-        } else {
-            this.source.clear();
-            this.snackbar = true;
-            this.text = "Nenhuma estação encontrada.";
+    async consulting() {
+        try {
+
+            debugger
+            await this.searchFeatures()
+            let features = []
+            this.geojson.features.forEach(feature => {
+                this.stations_selected.map(satation => {
+
+
+                    if (feature.properties.id === satation.id) {
+                        features.push(feature)
+                    }
+                })
+            })
+
+            this.geojson.features = features
+            if (this.geojson.features.length > 0) {
+                this.source.clear()
+                this.source.addFeatures(new GeoJSON().readFeatures(this.geojson))
+
+            } else {
+                this.source.clear();
+                this.snackbar = true;
+                this.text = "Nenhuma estação encontrada.";
+            }
+
+
+        } catch (error) {
+
         }
+
+
+
+
     }
 
 }

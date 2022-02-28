@@ -1,9 +1,16 @@
 <template>
   <div>
-    <app-bar></app-bar>
-    <div>
-      <filtro></filtro>
-    </div>
+    <app-bar :controller="controller"></app-bar>
+
+    <v-navigation-drawer
+      width="400"
+      absolute
+      clipped
+      right
+      v-model="controller.drawer"
+    >
+      <filtro :controller="controller"></filtro>
+    </v-navigation-drawer>
     <v-main style="height: 100vh">
       <div id="map"></div>
       <Form></Form>
@@ -31,6 +38,7 @@ export default {
   }),
 
   mounted() {
+    this.controller.created()
     this.controller.initMap()
   },
 }

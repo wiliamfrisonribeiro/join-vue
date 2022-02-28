@@ -10,6 +10,9 @@
       </v-img>
     </div>
     <v-spacer></v-spacer>
+    <v-btn icon color="white" @click="controller.drawer = !controller.drawer">
+      <v-icon>mdi-filter</v-icon>
+    </v-btn>
     <!--     <v-btn
       href="https://github.com/jacksonks/join-teste-front-vuejs"
       target="_blank"
@@ -23,5 +26,11 @@
 <script>
 export default {
   name: 'AppBar',
+  props: {
+    controller: {
+      type: Object,
+      required: true,
+    },
+  },
 }
 </script>

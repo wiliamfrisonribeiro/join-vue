@@ -1,6 +1,6 @@
 class Station {
 
-    fetchFeatures() {
+    searchFeatures() {
 
         const response = fetch(
             'https://raw.githubusercontent.com/jacksonks/geojson/master/station_list.geojson'
@@ -17,7 +17,7 @@ class Station {
         return response
     }
 
-    fetchStation() {
+    serchStation() {
         const response = fetch(
             'https://raw.githubusercontent.com/jacksonks/geojson/master/station.json'
         )
@@ -33,7 +33,7 @@ class Station {
         return response
     }
 
-    fetchStationType() {
+    searchStationType() {
         const response = fetch(
             'https://raw.githubusercontent.com/jacksonks/geojson/master/station_type.json'
         )
