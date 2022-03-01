@@ -17,6 +17,7 @@
                 small-chips
                 outlined
                 return-object
+                deletable-chips
                 no-data-text="Sem dados"
                 persistent-hint
                 required
@@ -68,6 +69,7 @@
                 multiple
                 small-chips
                 outlined
+                deletable-chips
                 clearable
                 :disabled="!controller.stations_types_selected.length > 0"
                 :hide-details="!controller.stations_types_selected.length > 0"
@@ -113,6 +115,7 @@
                 block
                 @keyup.enter="controller.consulting()"
                 @click="controller.consulting()"
+                :loading="controller.loading"
               >
                 <v-icon left color="white"> mdi-magnify</v-icon>Consultar</v-btn
               >

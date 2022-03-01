@@ -17,6 +17,20 @@
       </template>
       <span>Filtros</span>
     </v-tooltip>
+
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on }">
+        <v-btn
+          icon
+          href="https://github.com/wiliamfrisonribeiro/join-vue"
+          color="white"
+          v-on="on"
+        >
+          <v-icon>mdi-github</v-icon>
+        </v-btn>
+      </template>
+      <span>Github</span>
+    </v-tooltip>
   </v-app-bar>
 </template>
 <script>

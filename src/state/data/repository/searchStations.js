@@ -1,9 +1,9 @@
-class Station {
+class SearchStation {
 
     searchFeatures() {
 
         const response = fetch(
-            'https://raw.githubusercontent.com/jacksonks/geojson/master/station_list.geojson'
+            'https://raw.githubusercontent.com/wiliamfrisonribeiro/geojson/master/station_list.geojson'
         )
             .then((response) => response.json())
             .then((response) => {
@@ -19,7 +19,7 @@ class Station {
 
     serchStation() {
         const response = fetch(
-            'https://raw.githubusercontent.com/jacksonks/geojson/master/station.json'
+            'https://raw.githubusercontent.com/wiliamfrisonribeiro/geojson/master/station.json'
         )
             .then((response) => response.json())
             .then((response) => {
@@ -35,7 +35,7 @@ class Station {
 
     searchStationType() {
         const response = fetch(
-            'https://raw.githubusercontent.com/jacksonks/geojson/master/station_type.json'
+            'https://raw.githubusercontent.com/wiliamfrisonribeiro/geojson/master/station_type.json'
         )
             .then((response) => response.json())
             .then((response) => {
@@ -51,7 +51,4 @@ class Station {
 
 
 }
-
-
-
-export default Station
+export default SearchStation

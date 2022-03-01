@@ -1,16 +1,15 @@
 /* eslint-disable */
-import Dados from "../data/repository/dados"
-
-// This is library of openlayer for handle map
+import SearchStation from "../data/repository/searchStations"
 import GeoJSON from 'ol/format/GeoJSON'
 import Map from 'ol/Map'
 import View from 'ol/View'
-import { defaults as defaultControls, ScaleLine } from "ol/control";
-import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
+import { defaults as defaultControls, ScaleLine } from "ol/control"
+import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer"
 import { OSM, Vector as VectorSource } from 'ol/source'
 import Overlay from 'ol/Overlay'
 import { Fill, Stroke, Style, Icon, Circle } from 'ol/style'
-import dayjs from "dayjs";
+import dayjs from "dayjs"
+
 class Controller {
     station_list = []
     station_type_list = []
@@ -25,8 +24,9 @@ class Controller {
     source = new VectorSource()
     drawer = false
     snackbar = false
-
+    loading = false
     station = {}
+
 
 
     constructor(context) {
@@ -43,17 +43,17 @@ class Controller {
     }
 
     async searchFeatures() {
-        const dados = new Dados()
-        this.geojson = await dados.searchFeatures()
+        const serchStation = new SearchStation()
+        this.geojson = await serchStation.searchFeatures()
     }
     async searchStation() {
-        const dados = new Dados()
-        this.station_list = await dados.serchStation()
+        const serchStation = new SearchStation()
+        this.station_list = await serchStation.serchStation()
     }
 
     async searchStationType() {
-        const dados = new Dados()
-        this.station_type_list = await dados.searchStationType()
+        const serchStation = new SearchStation()
+        this.station_type_list = await serchStation.searchStationType()
 
         console.log(this.station_type_list)
 
@@ -116,7 +116,7 @@ class Controller {
             view: new View({
                 projection: "EPSG:4326",
                 center: [-49.276855, -25.441105],
-                zoom: 5,
+                zoom: 8,
             }),
         });
         var popup = document.querySelector(".popup-container");
@@ -193,6 +193,7 @@ class Controller {
 
     async consulting() {
         try {
+            this.loading = true
             if (this.contextFilter.$refs.form.validate()) {
                 await this.searchFeatures()
                 let features = []
@@ -207,7 +208,7 @@ class Controller {
                 if (this.geojson.features.length > 0) {
                     this.source.clear()
                     this.source.addFeatures(new GeoJSON().readFeatures(this.geojson))
-
+                    this.drawer = false
                 } else {
                     this.snackbar = true;
                     this.source.clear();
@@ -218,6 +219,8 @@ class Controller {
         } catch (error) {
             this.message = error
             this.snackbar = true
+        } finally {
+            this.loading = false
         }
     }
 
@@ -283,7 +286,6 @@ class Controller {
     iconStations(flagStationType) {
 
         if (flagStationType == "iconStationsType") {
-            debugger
             if (this.someStations("someStationType")) {
                 iconStationsType
                 return "mdi-close-box";
