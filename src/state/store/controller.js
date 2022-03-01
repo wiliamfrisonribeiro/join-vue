@@ -21,8 +21,10 @@ class Controller {
     context = null
     contextFilter = null
     vectorGeoJSON = null
+    message = null
     source = new VectorSource()
     drawer = false
+    snackbar = false
 
     station = {}
 
@@ -72,20 +74,17 @@ class Controller {
 
 
     initMap() {
-        // create vector layer
         var source = new VectorSource();
         var vector = new VectorLayer({
             source: source,
         });
-        // create title layer
+
         var raster = new TileLayer({
             source: new OSM(),
         });
-        // Vector data source in GeoJSON format
         this.vectorGeoJSON = new VectorLayer({
             source: this.source,
             style: function (feature) {
-                //console.log(feature.getProperties()); // <== all geojson properties
                 return [
                     new Style({
                         image: new Icon({
@@ -106,7 +105,6 @@ class Controller {
                 ];
             },
         });
-        // create map with 2 layer
         var map = new Map({
             controls: defaultControls().extend([
                 new ScaleLine({
@@ -123,8 +121,6 @@ class Controller {
         });
         var popup = document.querySelector(".popup-container");
 
-        console.log(popup)
-        debugger
         var overlayLayer = new Overlay({ element: popup });
         map.addOverlay(overlayLayer);
 
@@ -139,6 +135,33 @@ class Controller {
             fintOperetion: null,
         }
 
+        const station_type = [
+            {
+                id: "1",
+                name: "AGROMETEOROLOGICAL",
+                color: "#7cb5ec",
+            },
+            {
+                id: "2",
+                name: "CLIMATOLÓGICO",
+                color: "#434348",
+            },
+            {
+                id: "3",
+
+                color: "#90ed7d",
+            },
+            {
+                id: "4",
+                name: "HIDROMÉTRICO",
+                color: "#f7a35c",
+            },
+            {
+                id: "5",
+                name: "PLUVIOMETRIC",
+                color: "#8085e9",
+            },
+        ];
         this.station = station
         map.on("click", function (e) {
             overlayLayer.setPosition(undefined);
@@ -156,6 +179,12 @@ class Controller {
                 station.endOperetion = dayjs(
                     feature.get("operation_end_date")
                 ).format("DD/MM/YYYY")
+
+                station_type.forEach(item => {
+                    if (feature.get("station_type_id") == item.id) {
+                        station.stationType = item.name
+                    }
+                })
             })
 
         });
@@ -164,30 +193,31 @@ class Controller {
 
     async consulting() {
         try {
-            await this.searchFeatures()
-            let features = []
-            this.geojson.features.forEach(feature => {
-                this.stations_selected.map(satation => {
-                    if (feature.properties.id === satation.id) {
-                        features.push(feature)
-                    }
+            if (this.contextFilter.$refs.form.validate()) {
+                await this.searchFeatures()
+                let features = []
+                this.geojson.features.forEach(feature => {
+                    this.stations_selected.map(satation => {
+                        if (feature.properties.id === satation.id) {
+                            features.push(feature)
+                        }
+                    })
                 })
-            })
+                this.geojson.features = features
+                if (this.geojson.features.length > 0) {
+                    this.source.clear()
+                    this.source.addFeatures(new GeoJSON().readFeatures(this.geojson))
 
-            this.geojson.features = features
-            if (this.geojson.features.length > 0) {
-                this.source.clear()
-                this.source.addFeatures(new GeoJSON().readFeatures(this.geojson))
-
-            } else {
-                this.source.clear();
-                this.snackbar = true;
-                this.text = "Nenhuma estação encontrada.";
+                } else {
+                    this.snackbar = true;
+                    this.source.clear();
+                    this.message = "Nenhuma estação encontrada.";
+                }
             }
 
-
         } catch (error) {
-
+            this.message = error
+            this.snackbar = true
         }
     }
 
@@ -225,16 +255,15 @@ class Controller {
         }
     }
 
-    toggle(flagStatioType) {
-        debugger
-        if (flagStatioType == "stationsType") {
+    toggle(flagStationType) {
+        if (flagStationType == "stationsType") {
             this.contextFilter.$nextTick(() => {
                 if (this.allStations("allStationsType")) {
-                    this.stations_types_selected = [];
+                    this.stations_selected = [];
                 } else if (this.someStations("someStationsType")) {
-                    this.stations_types_selected = [];
-                } else if (this.emptyStations("emptyStationsType")) {
-                    this.stations_types_selected = this.station_type_list.slice();
+                    this.stations_selected = [];
+                } else if (this.emptyStations("emptyStations")) {
+                    this.stations_selected = this.stations.slice();
                 }
             });
 
@@ -251,17 +280,23 @@ class Controller {
         }
     }
 
-    iconStations(flagStatioType) {
-        if (flagStatioType == "iconStationsType") {
+    iconStations(flagStationType) {
+
+        if (flagStationType == "iconStationsType") {
+            debugger
             if (this.someStations("someStationType")) {
+                iconStationsType
                 return "mdi-close-box";
             } else if (this.allStations("allStationType")) {
+
                 return "mdi-close-box";
             } else {
+
                 return "mdi-checkbox-blank-outline";
             }
 
         } else {
+
             if (this.someStations("")) {
                 return "mdi-close-box";
             } else if (this.allStations("")) {

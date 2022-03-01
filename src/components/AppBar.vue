@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar app color="cyan lighte-1">
+  <v-app-bar app color="cyan lighte-1" height="80">
     <div>
       <v-img contain src="/logo.png" max-width="130" max-height="85"> </v-img>
     </div>
@@ -17,14 +17,6 @@
       </template>
       <span>Filtros</span>
     </v-tooltip>
-    <!--     <v-btn
-      href="https://github.com/jacksonks/join-teste-front-vuejs"
-      target="_blank"
-      text
-    >
-      <span class="mr-2">Github</span>
-      <v-icon></v-icon>
-    </v-btn> -->
   </v-app-bar>
 </template>
 <script>
