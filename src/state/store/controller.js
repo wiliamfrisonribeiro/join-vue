@@ -8,24 +8,30 @@ import View from 'ol/View'
 import { defaults as defaultControls, ScaleLine } from "ol/control";
 import { Tile as TileLayer, Vector as VectorLayer } from "ol/layer";
 import { OSM, Vector as VectorSource } from 'ol/source'
-import { Fill, Stroke, Style, Icon, Circle } from 'ol/style'
 import Overlay from 'ol/Overlay'
+import { Fill, Stroke, Style, Icon, Circle } from 'ol/style'
+import dayjs from "dayjs";
 class Controller {
     station_list = []
     station_type_list = []
     stations_types_selected = []
     stations_selected = []
     stations = []
-    geojson = undefined
+    geojson = null
     context = null
+    contextFilter = null
     vectorGeoJSON = null
-    drawer = false
     source = new VectorSource()
+    drawer = false
+
+    station = {}
 
 
     constructor(context) {
         this.context = context
     }
+
+
     async created() {
         Promise.all([
             this.searchFeatures(),
@@ -111,98 +117,57 @@ class Controller {
             layers: [raster, vector, this.vectorGeoJSON],
             view: new View({
                 projection: "EPSG:4326",
-                center: [-48.815011395380765, -24.650150016322684],
+                center: [-49.276855, -25.441105],
                 zoom: 5,
             }),
         });
         var popup = document.querySelector(".popup-container");
+
+        console.log(popup)
+        debugger
         var overlayLayer = new Overlay({ element: popup });
         map.addOverlay(overlayLayer);
-        let station_type = [
-            {
-                id: "1",
-                created_at: "2020-11-30 10:43:46.687141-03",
-                update_at: "2020-11-30 10:43:46.687162-03",
-                name: "AGROMETEOROLOGICAL",
-                color: "#7cb5ec",
-            },
-            {
-                id: "2",
-                created_at: "2020-11-30 10:43:46.688442-03",
-                update_at: "2020-11-30 10:43:46.688459-03",
-                name: "CLIMATOLÓGICO",
-                color: "#434348",
-            },
-            {
-                id: "3",
-                created_at: "2020-11-30 10:43:46.68895-03",
-                update_at: "2020-11-30 10:43:46.688964-03",
-                name: "HIDROCLIMATOLÓGICO",
-                color: "#90ed7d",
-            },
-            {
-                id: "4",
-                created_at: "2020-11-30 10:43:46.689495-03",
-                update_at: "2020-11-30 10:43:46.689513-03",
-                name: "HIDROMÉTRICO",
-                color: "#f7a35c",
-            },
-            {
-                id: "5",
-                created_at: "2020-11-30 10:43:46.690113-03",
-                update_at: "2020-11-30 10:43:46.690134-03",
-                name: "PLUVIOMETRIC",
-                color: "#8085e9",
-            },
-        ];
-        var overlayFeatureId = document.getElementById("feature-id");
-        var overlayFeatureName = document.getElementById("feature-name");
-        var overlayFeatureLatitude = document.getElementById("feature-latitude");
-        var overlayFeatureLongitude =
-            document.getElementById("feature-longitude");
-        var overlayFeatureElevation =
-            document.getElementById("feature-elevation");
-        var overlayFeatureType = document.getElementById("feature-type");
-        var overlayFeatureStart = document.getElementById("feature-start");
-        var overlayFeatureEnd = document.getElementById("feature-end");
 
+        const station = {
+            id: null,
+            name: null,
+            stationType: null,
+            latitude: null,
+            elevation: null,
+            longitude: null,
+            initOperetion: null,
+            fintOperetion: null,
+        }
+
+        this.station = station
         map.on("click", function (e) {
             overlayLayer.setPosition(undefined);
-            map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
-                overlayLayer.setPosition(e.coordinate);
-                overlayFeatureId.innerHTML = feature.get("id");
-                overlayFeatureName.innerHTML = feature.get("name");
-                overlayFeatureLatitude.innerHTML = feature.get("latitude");
-                overlayFeatureLongitude.innerHTML = feature.get("longitude");
-                overlayFeatureElevation.innerHTML = feature.get("elevation_meters");
-                overlayFeatureStart.innerHTML = dayjs(
+            map.forEachFeatureAtPixel(e.pixel, function (feature) {
+                overlayLayer.setPosition(e.coordinate)
+                station.id = feature.get("id");
+
+                station.name = feature.get('name')
+                station.latitude = feature.get("latitude")
+                station.longitude = feature.get("longitude")
+                station.elevation = feature.get("elevation_meters")
+                station.initOperetion = dayjs(
                     feature.get("operation_start_date")
-                ).format("DD/MM/YYYY");
-                //overlayFeatureStart.innerHTML = feature.get("operation_start_date");
-                overlayFeatureEnd.innerHTML = dayjs(
+                ).format("DD/MM/YYYY")
+                station.endOperetion = dayjs(
                     feature.get("operation_end_date")
-                ).format("DD/MM/YYYY");
-                //overlayFeatureEnd.innerHTML = feature.get("operation_end_date");
-                for (let item in station_type) {
-                    if (feature.get("station_type_id") == station_type[item].id) {
-                        overlayFeatureType.innerHTML = station_type[item].name;
-                    }
-                }
-            });
+                ).format("DD/MM/YYYY")
+            })
+
         });
     }
 
 
     async consulting() {
         try {
-
-            debugger
             await this.searchFeatures()
             let features = []
             this.geojson.features.forEach(feature => {
                 this.stations_selected.map(satation => {
-
-
                     if (feature.properties.id === satation.id) {
                         features.push(feature)
                     }
@@ -224,12 +189,90 @@ class Controller {
         } catch (error) {
 
         }
+    }
 
+    allStations(flagStatioType) {
+        if (flagStatioType == "allStationsType") {
+            return (
+                this.stations_types_selected.length === this.station_type_list.length
+            )
+        } else {
+            return this.stations_selected.length === this.stations.length;
+        }
+    }
 
+    someStations(flagStatioType) {
 
+        if (flagStatioType == "someStationsType") {
+            return (
+                this.stations_types_selected.length > 0 &&
+                this.stations_types_selected.length < this.station_type_list.length
+            )
+        } else {
+            return (
+                this.stations_selected.length > 0 &&
+                this.stations_selected.length < this.stations.length
+            )
+        }
 
     }
 
+    emptyStations(flagStatioType) {
+        if (flagStatioType == "emptyStationsType") {
+            return this.stations_types_selected.length === 0;
+        } else {
+            return this.stations_selected.length === 0
+        }
+    }
+
+    toggle(flagStatioType) {
+        debugger
+        if (flagStatioType == "stationsType") {
+            this.contextFilter.$nextTick(() => {
+                if (this.allStations("allStationsType")) {
+                    this.stations_types_selected = [];
+                } else if (this.someStations("someStationsType")) {
+                    this.stations_types_selected = [];
+                } else if (this.emptyStations("emptyStationsType")) {
+                    this.stations_types_selected = this.station_type_list.slice();
+                }
+            });
+
+        } else {
+            this.contextFilter.$nextTick(() => {
+                if (this.allStations("")) {
+                    this.stations_selected = [];
+                } else if (this.someStations("")) {
+                    this.stations_selected = [];
+                } else if (this.emptyStations("")) {
+                    this.stations_selected = this.stations.slice();
+                }
+            });
+        }
+    }
+
+    iconStations(flagStatioType) {
+        if (flagStatioType == "iconStationsType") {
+            if (this.someStations("someStationType")) {
+                return "mdi-close-box";
+            } else if (this.allStations("allStationType")) {
+                return "mdi-close-box";
+            } else {
+                return "mdi-checkbox-blank-outline";
+            }
+
+        } else {
+            if (this.someStations("")) {
+                return "mdi-close-box";
+            } else if (this.allStations("")) {
+                return "mdi-close-box";
+            } else {
+                return "mdi-checkbox-blank-outline";
+            }
+        }
+
+
+    }
 }
 
 

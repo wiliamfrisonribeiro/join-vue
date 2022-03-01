@@ -13,7 +13,7 @@
     </v-navigation-drawer>
     <v-main style="height: 100vh">
       <div id="map"></div>
-      <Form></Form>
+      <Form :controller="controller" class="popup-container"></Form>
     </v-main>
   </div>
 </template>

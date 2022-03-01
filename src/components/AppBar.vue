@@ -1,18 +1,22 @@
 <template>
   <v-app-bar app color="cyan lighte-1">
     <div>
-      <v-img
-        alt="Join White Logo"
-        contain
-        src="https://jointecnologia.com.br/wp-content/themes/theme-bones-master/library/images/logo.png"
-        width="130"
-      >
-      </v-img>
+      <v-img contain src="/logo.png" max-width="130" max-height="85"> </v-img>
     </div>
     <v-spacer></v-spacer>
-    <v-btn icon color="white" @click="controller.drawer = !controller.drawer">
-      <v-icon>mdi-filter</v-icon>
-    </v-btn>
+    <v-tooltip bottom>
+      <template v-slot:activator="{ on }">
+        <v-btn
+          icon
+          color="white"
+          @click="controller.drawer = !controller.drawer"
+          v-on="on"
+        >
+          <v-icon>mdi-filter</v-icon>
+        </v-btn>
+      </template>
+      <span>Filtros</span>
+    </v-tooltip>
     <!--     <v-btn
       href="https://github.com/jacksonks/join-teste-front-vuejs"
       target="_blank"

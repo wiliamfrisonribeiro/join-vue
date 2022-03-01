@@ -5,7 +5,6 @@
       <v-row class="d-flex justify-center">
         <v-col cols="12">
           <v-autocomplete
-            dense
             v-model="controller.stations_types_selected"
             :items="controller.station_type_list"
             label="Tipos de Estações"
@@ -13,20 +12,45 @@
             item-text="name"
             item-value="name"
             multiple
-            outlined
             small-chips
+            outlined
             return-object
             no-data-text="Sem dados"
             persistent-hint
             :hint="`${controller.stations_types_selected.length} Opções Selecionadas`"
           >
+            <template v-slot:prepend-item>
+              <v-list-item ripple @click="controller.toggle('stationsType')">
+                <v-list-item-action>
+                  <v-icon
+                    :color="
+                      controller.someStations('someStationsType') ||
+                      controller.allStations('allStationsType')
+                        ? 'red'
+                        : '#757575'
+                    "
+                    >{{ controller.iconStations('iconStationsType') }}</v-icon
+                  >
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{
+                      controller.someStations('someStationsType') ||
+                      controller.allStations('allStationsType')
+                        ? 'Remover Seleção'
+                        : 'Todos'
+                    }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-divider />
+            </template>
           </v-autocomplete>
         </v-col>
       </v-row>
       <v-row class="d-flex justify-center">
         <v-col cols="12">
           <v-autocomplete
-            dense
             :items="controller.stations"
             v-model="controller.stations_selected"
             item-text="name"
@@ -42,6 +66,30 @@
             :hint="`${controller.stations_selected.length} Opções Selecionadas`"
             return-object
             no-data-text="Sem dados"
+          >
+            <template v-slot:prepend-item>
+              <v-list-item ripple @click="controller.toggle('')">
+                <v-list-item-action>
+                  <v-icon
+                    :color="
+                      controller.someStations('') || controller.allStations('')
+                        ? 'red'
+                        : '#757575'
+                    "
+                    >{{ controller.iconStations('') }}</v-icon
+                  >
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{
+                      controller.someStations('') || controller.allStations('')
+                        ? 'Remover Seleção'
+                        : 'Todos'
+                    }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-divider /> </template
           ></v-autocomplete>
         </v-col>
       </v-row>
@@ -76,6 +124,10 @@ export default {
       console.log('passou')
       this.controller.change()
     },
+  },
+
+  mounted() {
+    this.controller.contextFilter = this
   },
 }
 </script>

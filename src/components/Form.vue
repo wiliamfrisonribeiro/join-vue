@@ -1,56 +1,85 @@
 <template>
-  <v-card width="500" class="text-center popup-container">
-    <v-card-title class="headline grey lighten-2"
-      >Dados da Estação</v-card-title
-    >
+  <v-card width="500" class="popup-container">
+    <v-card-title id="card-title">Dados da Estação</v-card-title>
     <v-card-text class="popup-container">
       <v-container fluid class="popup-container">
-        <v-row align="center" class="popup-container mb-n7">
-          <v-col class="d-flex" cols="12">
-            <v-btn outlined color="black">
-              <label>Identificador: </label
-              ><strong class="overlay-text" id="feature-id"></strong><br />
-            </v-btn>
-            <v-spacer />
-            <v-btn outlined color="black">
-              <label>Nome: </label
-              ><strong class="overlay-text" id="feature-name"></strong>
-            </v-btn>
+        <v-row class="popup-container">
+          <v-col class="d-flex" cols="3">
+            <v-text-field
+              label="ID"
+              dense
+              outlined
+              v-model="controller.station.id"
+            >
+            </v-text-field>
           </v-col>
-          <v-col class="d-flex" cols="12">
-            <v-btn outlined color="black" block>
-              <label>Latitude:</label>
-              <strong class="overlay-text" id="feature-latitude"></strong>
-            </v-btn>
+          <v-col class="d-flex" cols="9">
+            <v-text-field
+              label="Name"
+              outlined
+              dense
+              v-model="controller.station.name"
+            >
+            </v-text-field>
           </v-col>
-          <v-col class="d-flex" cols="12">
-            <v-btn outlined color="black" block>
-              <label>Longitude:</label
-              ><strong class="overlay-text" id="feature-longitude"></strong>
-            </v-btn>
+
+          <v-col class="d-flex" cols="6">
+            <v-text-field
+              outlined
+              dense
+              label="Longitude"
+              v-model="controller.station.longitude"
+            >
+            </v-text-field>
           </v-col>
-          <v-col class="d-flex" cols="12">
-            <v-btn outlined color="black">
-              <label>Elevação:</label
-              ><strong class="overlay-text" id="feature-elevation"></strong>
-            </v-btn>
-            <v-spacer />
-            <v-btn outlined color="black">
-              <label>Tipo de Estação:</label
-              ><strong class="overlay-text" id="feature-type"></strong>
-            </v-btn>
+          <v-col class="d-flex" cols="6">
+            <v-text-field
+              outlined
+              dense
+              label="Longitude"
+              v-model="controller.station.longitude"
+            >
+            </v-text-field>
           </v-col>
-          <v-col class="d-flex" cols="12">
-            <v-btn outlined color="black" block>
-              <label>Inicio de Operação:</label
-              ><strong class="overlay-text" id="feature-start"></strong>
-            </v-btn>
+
+          <v-col class="d-flex" cols="2">
+            <v-text-field
+              outlined
+              label="Elevação"
+              dense
+              v-model="controller.station.elevation"
+            >
+            </v-text-field>
           </v-col>
+          <v-col cols="5">
+            <v-text-field
+              outlined
+              dense
+              append-icon="mdi-clock"
+              label="Inicio de Operação"
+              v-model="controller.station.initOperetion"
+            >
+            </v-text-field>
+          </v-col>
+          <v-col class="d-flex" cols="4">
+            <v-text-field
+              outlined
+              dense
+              append-icon="mdi-clock"
+              label="Fim de Operação"
+              v-model="controller.station.endOperetion"
+            >
+            </v-text-field>
+          </v-col>
+
           <v-col class="d-flex" cols="12">
-            <v-btn outlined color="black" block>
-              <label>Fim de Operação:</label
-              ><strong class="overlay-text" id="feature-end"></strong>
-            </v-btn>
+            <v-text-field
+              outlined
+              dense
+              label="Tipo Estação"
+              v-model="controller.station.endOperetion"
+            >
+            </v-text-field>
           </v-col>
         </v-row>
       </v-container>
@@ -61,5 +90,11 @@
 <script>
 export default {
   name: 'Form',
+  props: {
+    controller: {
+      type: Object,
+      required: true,
+    },
+  },
 }
 </script>
