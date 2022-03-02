@@ -8,7 +8,6 @@
       <popup-station
         :controller="controller"
         class="popup-container"
-        id="tooltipMap"
       ></popup-station>
       <v-snackbar v-model="controller.snackbar" :timeout="5000" color="red">
         {{ controller.message }}

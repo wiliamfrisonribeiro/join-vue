@@ -186,8 +186,11 @@ class Controller {
                     }
                 })
             })
-
+            let tooltip = document.getElementById("tooltipMap");
+            tooltip.style.visibility = "visible";
+            tooltip.style.display = "block";
         });
+
     }
 
 
