@@ -114,7 +114,7 @@
                 <v-divider class="mt-2"></v-divider> </template
             ></v-autocomplete>
             <span
-              v-show="!controller.stationsSelected.length > 0"
+              v-show="!controller.stationsTypesSelected.length > 0"
               style="color: red"
               >*selecione pelo menos 1 tipo de estação para desbloquear o
               seletor de estações</span
