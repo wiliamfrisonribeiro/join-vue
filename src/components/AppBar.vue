@@ -4,7 +4,7 @@
       <v-img contain src="/logo.png" max-width="130" max-height="85"> </v-img>
     </div>
     <v-spacer></v-spacer>
-    <v-tooltip bottom>
+    <v-tooltip top>
       <template v-slot:activator="{ on }">
         <v-btn
           icon
