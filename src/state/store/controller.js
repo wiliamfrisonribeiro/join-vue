@@ -272,6 +272,11 @@ class Controller {
         })
     }
 
+    close() {
+        let tooltip = document.getElementById("tooltipMap");
+        tooltip.style.visibility = "hidden";
+        tooltip.style.display = "none";
+    }
 
 
 }
