@@ -8,20 +8,6 @@
       <template v-slot:activator="{ on }">
         <v-btn
           icon
-          color="white"
-          @click="controller.drawer = !controller.drawer"
-          v-on="on"
-        >
-          <v-icon>mdi-filter</v-icon>
-        </v-btn>
-      </template>
-      <span>Filtros</span>
-    </v-tooltip>
-
-    <v-tooltip bottom>
-      <template v-slot:activator="{ on }">
-        <v-btn
-          icon
           href="https://github.com/wiliamfrisonribeiro/join-vue"
           color="white"
           v-on="on"

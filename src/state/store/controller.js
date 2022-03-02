@@ -11,10 +11,11 @@ import { Fill, Stroke, Style, Icon, Circle } from 'ol/style'
 import dayjs from "dayjs"
 
 class Controller {
-    station_list = []
-    station_type_list = []
-    stations_types_selected = []
-    stations_selected = []
+
+    stationsTypesSelected = []
+    stationsSelected = []
+    stationList = []
+    stationTypeList = []
     stations = []
     geojson = null
     context = null
@@ -22,12 +23,11 @@ class Controller {
     vectorGeoJSON = null
     message = null
     source = new VectorSource()
+    station = {}
     drawer = false
     snackbar = false
     loading = false
-    station = {}
-
-
+    expand = false
 
     constructor(context) {
         this.context = context
@@ -48,23 +48,23 @@ class Controller {
     }
     async searchStation() {
         const serchStation = new SearchStation()
-        this.station_list = await serchStation.serchStation()
+        this.stationList = await serchStation.serchStation()
     }
 
     async searchStationType() {
         const serchStation = new SearchStation()
-        this.station_type_list = await serchStation.searchStationType()
+        this.stationTypeList = await serchStation.searchStationType()
 
-        console.log(this.station_type_list)
+        console.log(this.stationTypeList)
 
     }
 
     change() {
         /* eslint-disable */
         this.stations = []
-        this.stations_types_selected.forEach(sation_type => {
-            this.station_list.forEach(station => {
-                if (sation_type.id == station.station_type_id) {
+        this.stationsTypesSelected.forEach(sationType => {
+            this.stationList.forEach(station => {
+                if (sationType.id == station.station_type_id) {
                     this.stations.push(station)
                 }
             })
@@ -194,27 +194,27 @@ class Controller {
     async consulting() {
         try {
             this.loading = true
-            if (this.contextFilter.$refs.form.validate()) {
-                await this.searchFeatures()
-                let features = []
-                this.geojson.features.forEach(feature => {
-                    this.stations_selected.map(satation => {
-                        if (feature.properties.id === satation.id) {
-                            features.push(feature)
-                        }
-                    })
+
+            await this.searchFeatures()
+            let features = []
+            this.geojson.features.forEach(feature => {
+                this.stationsSelected.map(satation => {
+                    if (feature.properties.id === satation.id) {
+                        features.push(feature)
+                    }
                 })
-                this.geojson.features = features
-                if (this.geojson.features.length > 0) {
-                    this.source.clear()
-                    this.source.addFeatures(new GeoJSON().readFeatures(this.geojson))
-                    this.drawer = false
-                } else {
-                    this.snackbar = true;
-                    this.source.clear();
-                    this.message = "Nenhuma estação encontrada.";
-                }
+            })
+            this.geojson.features = features
+            if (this.geojson.features.length > 0) {
+                this.source.clear()
+                this.source.addFeatures(new GeoJSON().readFeatures(this.geojson))
+                this.drawer = false
+            } else {
+                this.snackbar = true;
+                this.source.clear();
+                this.message = "Nenhuma estação encontrada.";
             }
+
 
         } catch (error) {
             this.message = error
@@ -224,92 +224,56 @@ class Controller {
         }
     }
 
-    allStations(flagStatioType) {
-        if (flagStatioType == "allStationsType") {
-            return (
-                this.stations_types_selected.length === this.station_type_list.length
-            )
-        } else {
-            return this.stations_selected.length === this.stations.length;
-        }
+    allStationTypes() {
+        return this.stationsTypesSelected.length === this.stationTypeList.length
+    }
+    someTypesStation() {
+        return this.stationsTypesSelected.length > 0 && !this.allStationTypes()
     }
 
-    someStations(flagStatioType) {
-
-        if (flagStatioType == "someStationsType") {
-            return (
-                this.stations_types_selected.length > 0 &&
-                this.stations_types_selected.length < this.station_type_list.length
-            )
-        } else {
-            return (
-                this.stations_selected.length > 0 &&
-                this.stations_selected.length < this.stations.length
-            )
-        }
+    iconStationType() {
+        if (this.allStationTypes()) return 'mdi-close-box'
+        if (this.someTypesStation()) return 'mdi-minus-box'
+        return 'mdi-checkbox-blank-outline'
 
     }
 
-    emptyStations(flagStatioType) {
-        if (flagStatioType == "emptyStationsType") {
-            return this.stations_types_selected.length === 0;
-        } else {
-            return this.stations_selected.length === 0
-        }
-    }
-
-    toggle(flagStationType) {
-        if (flagStationType == "stationsType") {
-            this.contextFilter.$nextTick(() => {
-                if (this.allStations("allStationsType")) {
-                    this.stations_selected = [];
-                } else if (this.someStations("someStationsType")) {
-                    this.stations_selected = [];
-                } else if (this.emptyStations("emptyStations")) {
-                    this.stations_selected = this.stations.slice();
-                }
-            });
-
-        } else {
-            this.contextFilter.$nextTick(() => {
-                if (this.allStations("")) {
-                    this.stations_selected = [];
-                } else if (this.someStations("")) {
-                    this.stations_selected = [];
-                } else if (this.emptyStations("")) {
-                    this.stations_selected = this.stations.slice();
-                }
-            });
-        }
-    }
-
-    iconStations(flagStationType) {
-
-        if (flagStationType == "iconStationsType") {
-            if (this.someStations("someStationType")) {
-                iconStationsType
-                return "mdi-close-box";
-            } else if (this.allStations("allStationType")) {
-
-                return "mdi-close-box";
+    toggleStationType() {
+        this.contextFilter.$nextTick(() => {
+            if (this.allStationTypes()) {
+                this.stationsTypesSelected = []
             } else {
-
-                return "mdi-checkbox-blank-outline";
+                this.stationsTypesSelected = this.stationTypeList.slice()
             }
+        })
+    }
 
-        } else {
+    allStations() {
+        return this.stationsSelected.length === this.stations.length
+    }
+    someStations() {
+        return this.stationsSelected.length > 0 && !this.allStations()
+    }
 
-            if (this.someStations("")) {
-                return "mdi-close-box";
-            } else if (this.allStations("")) {
-                return "mdi-close-box";
-            } else {
-                return "mdi-checkbox-blank-outline";
-            }
-        }
-
+    iconStations() {
+        if (this.allStations()) return 'mdi-close-box'
+        if (this.someStations()) return 'mdi-minus-box'
+        return 'mdi-checkbox-blank-outline'
 
     }
+
+    toggleStations() {
+        this.contextFilter.$nextTick(() => {
+            if (this.allStations()) {
+                this.stationsSelected = []
+            } else {
+                this.stationsSelected = this.stations.slice()
+            }
+        })
+    }
+
+
+
 }
 
 

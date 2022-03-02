@@ -1,17 +1,9 @@
 <template>
   <div>
     <app-bar :controller="controller"></app-bar>
-    <v-navigation-drawer
-      width="400"
-      absolute
-      clipped
-      right
-      @keypress="controller.drawer = false"
-      v-model="controller.drawer"
-    >
-      <filter-station :controller="controller"></filter-station>
-    </v-navigation-drawer>
+
     <v-main style="height: 100vh">
+      <filter-stations :controller="controller"></filter-stations>
       <div id="map"></div>
       <popup-station
         :controller="controller"
@@ -30,26 +22,26 @@
 </template>
 
 <script>
-//Components
-
 import AppBar from '../components/AppBar.vue'
-import FilterStation from '../components/Filter.vue'
 import PopupStation from '../components/Popup.vue'
-//Controller da aplicação
+import FilterStations from '../components/Filter.vue'
 import Controller from '../state/store/controller.js'
 export default {
   name: 'App',
   components: {
     AppBar,
-    FilterStation,
+    FilterStations,
     PopupStation,
   },
   data: (context) => ({
     controller: new Controller(context),
   }),
 
-  async mounted() {
+  created() {
     this.controller.created()
+  },
+
+  mounted() {
     this.controller.initMap()
   },
 }
