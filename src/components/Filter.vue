@@ -85,7 +85,7 @@
               :disabled="!controller.stationsTypesSelected.length > 0"
               :hide-details="!controller.stationsTypesSelected.length > 0"
               :persistent-hint="controller.stationsTypesSelected.length > 0"
-              :hint="`${controller.stationsTypesSelected.length} Opções Selecionadas`"
+              :hint="`${controller.stationsSelected.length} Opções Selecionadas`"
               return-object
               no-data-text="Sem dados"
               :rules="[(v) => !!v || 'Preencha as Estações']"
@@ -99,7 +99,7 @@
                   <v-list-item-action>
                     <v-icon
                       :color="
-                        controller.stationsTypesSelected.length > 0
+                        controller.stationsSelected.length > 0
                           ? 'indigo darken-4'
                           : ''
                       "
