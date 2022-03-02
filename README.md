@@ -1,9 +1,5 @@
 # teste-join-vuejs
 
-## Exemplo
-
-https://open-layers.herokuapp.com/
-
 ## Project setup
 
 ```
