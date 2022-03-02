@@ -1,6 +1,13 @@
 <template>
   <v-card width="500" class="popup-container">
-    <v-card-title id="card-title">Dados da Estação</v-card-title>
+    <v-card-title id="card-title" dense
+      >Dados da Estação
+
+      <v-spacer></v-spacer>
+      <v-btn @click="controller.close" small icon color="black"
+        ><v-icon>mdi-window-close</v-icon></v-btn
+      >
+    </v-card-title>
     <v-card-text>
       <v-row>
         <v-col class="pt-0" cols="3" sm="3">
